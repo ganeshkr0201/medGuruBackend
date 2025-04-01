@@ -30,6 +30,9 @@ app.use(checkForAuthenticationCookie('token'));
 
 
 //EXPRESS ROUTES
+app.get('/', (req, res) => {
+    return res.send('API WORKING');
+})
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
 

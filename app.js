@@ -9,7 +9,7 @@ import userRouter from './routers/user.js';
 import chatRouter from './routers/chat.js';
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 
 //CONNECTING TO DATABASE

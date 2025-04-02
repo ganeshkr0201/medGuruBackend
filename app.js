@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import { checkForAuthenticationCookie } from './middlewares/checkForAuthentication.js';
 import { connectToDB } from './config/connectDB.js';
@@ -26,6 +27,11 @@ connectToDB(process.env.MONGO_URL)
 app.use(express.json());
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie('token'));
+app.use(cors(({
+    origin: process.env.FRONTEND_ORIGIN,
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+})));
 
 
 

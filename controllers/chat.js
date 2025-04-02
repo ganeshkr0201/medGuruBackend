@@ -65,7 +65,7 @@ const handleReqResFromAi = async (req, res) => {
             const chat = new Chat({ 
               userId: user_id, 
               sessionId: sessionId || uuidv4(),
-              title: title, 
+              title: title || userMessage,
               messages: messages 
         });
         await chat.save();

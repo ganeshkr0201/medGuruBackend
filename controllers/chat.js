@@ -8,7 +8,14 @@ import { v4 as uuidv4 } from "uuid";
 
 const getUserChatHistory = async (req, res) => {
     try {
-        const user_id = req.user?.id;
+        const { user_id } = req.params;
+        console.log(user_id);
+
+        const user = await User.findById(user_id);
+        if(!user) {
+            return res.send({ success: false, message: "User Doesn't Exist" });
+        }
+        console.log(user);
 
         const now = moment();
         const startOfToday = now.startOf("day").toDate();
@@ -46,11 +53,14 @@ const getUserChatHistory = async (req, res) => {
 
 const handleReqResFromAi = async (req, res) => {
     try {
-        const user_id = req.user?.id;
+        const { user_id, sessionId } = req.params;
         const user = await User.findById(user_id);
-        const { sessionId, title, userMessage } = req.body;
+        const { title, userMessage } = req.body;
         if(!user) {
             return res.send({success: false, error: "User Not Found"});
+        }
+        if(!userMessage) {
+            return res.send({success: false, error: "user message missing"});
         }
         const aiMessage = await sendReqToGemini(userMessage);
         const messages = [
@@ -65,7 +75,7 @@ const handleReqResFromAi = async (req, res) => {
             const chat = new Chat({ 
               userId: user_id, 
               sessionId: sessionId || uuidv4(),
-              title: title || userMessage,
+              title: title || userMessage, 
               messages: messages 
         });
         await chat.save();
@@ -84,7 +94,24 @@ const handleReqResFromAi = async (req, res) => {
     }
 }
 
+
+const deleteChatHistory = async (req, res) => {
+    try {
+        const { user_id, sessionId } = req.params;
+        const result = await Chat.deleteMany({ 
+            userId: user_id, 
+            sessionId: sessionId 
+        });
+        console.log(`${result.deletedCount} chat(s) deleted.`);
+        return res.send({ success: true, message: "chat delete successful"});
+    }
+    catch (error) {
+        return res.send({ success: false, error: error.message });
+    }
+}
+
 export {
     handleReqResFromAi,
     getUserChatHistory,
+    deleteChatHistory,
 }

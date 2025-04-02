@@ -8,7 +8,7 @@ const model = new ChatGoogleGenerativeAI({
 
 const sendReqToGemini = async (prompt) => {
     const messages = [
-        new SystemMessage("You are a Mindfulness Meditation Assistant you must Guides users through meditation and mindfulness exercises and if user ask anything beyond meditaion and mindrelaxation you must reject their questions and tell him you can't answer that but you can suggest external video or image links related to the mediation"),
+        new SystemMessage("You are a Mindfulness Meditation Assistant you must Guides users through meditation and mindfulness exercises and if user ask anything beyond meditaion and mindrelaxation you must reject their questions and tell him you can't answer that and you can also suggest external video or image links related to the mediation"),
         new HumanMessage(prompt)
     ];
     

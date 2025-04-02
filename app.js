@@ -27,12 +27,12 @@ connectToDB(process.env.MONGO_URL)
 app.use(express.json());
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie('token'));
-app.use(cors(({
-    origin: process.env.FRONTEND_ORIGIN,
-    allowedHeaders: ["Content-Type", "Authorization"],
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-})));
+app.use(cors({
+  origin: process.env.FRONTEND_ORIGIN,
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+  methods: "GET,POST,PUT,DELETE",
+}));
 
 
 

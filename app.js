@@ -26,7 +26,7 @@ connectToDB(process.env.MONGO_URL)
 //EXPRESS MIDDLEWARES
 app.use(express.json());
 app.use(cookieParser());
-app.use(checkForAuthenticationCookie('token'));
+// app.use(checkForAuthenticationCookie('token'));
 app.use(cors({
   origin: process.env.FRONTEND_ORIGIN,
   credentials: true,

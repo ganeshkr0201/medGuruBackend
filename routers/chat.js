@@ -3,9 +3,9 @@ import { handleReqResFromAi, getUserChatHistory, deleteChatHistory } from '../co
 
 const chatRouter = express.Router();
 
-chatRouter.post('/:user_id/:sessionId', handleReqResFromAi);
 chatRouter.get("/history/:user_id", getUserChatHistory);
 chatRouter.delete("/history/:user_id/:sessionId", deleteChatHistory);
+chatRouter.post('/:user_id/:sessionId', handleReqResFromAi);
 
 
 export default chatRouter;

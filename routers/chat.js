@@ -1,9 +1,9 @@
 import express from 'express';
-import { handleHistory, handleReqResFromAi } from '../controllers/chat.js';
+import { handleReqResFromAi, getUserChatHistory } from '../controllers/chat.js';
 
 const chatRouter = express.Router();
 
 chatRouter.post('/', handleReqResFromAi);
-chatRouter.post('/history', handleHistory);
+chatRouter.get("/history", getUserChatHistory);
 
 export default chatRouter;

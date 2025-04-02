@@ -29,6 +29,7 @@ app.use(cookieParser());
 app.use(checkForAuthenticationCookie('token'));
 app.use(cors(({
     origin: process.env.FRONTEND_ORIGIN,
+    allowedHeaders: ["Content-Type", "Authorization"],
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
 })));

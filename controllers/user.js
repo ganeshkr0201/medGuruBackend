@@ -18,7 +18,12 @@ const handleSignUp = async (req, res) => {
             password
         });
         const token = createTokenForUser(user);
-        return res.cookie("token", token).send({sucess: true, token: token});
+        return res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+          }).send({sucess: true, token: token});
     }
     catch(error) {
         return res.send({success: false, error: error.message});
@@ -35,7 +40,12 @@ const handleSignIn = async (req, res) => {
         return res.send({success: false, error: "Incorrect Password"});
     }
     const token = createTokenForUser(user);
-    return res.cookie("token", token).send({ success: true, token: token});
+    return res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+          }).send({sucess: true, token: token});
 }
 
 const handleLogout = (req, res) => {

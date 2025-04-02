@@ -44,47 +44,40 @@ const getUserChatHistory = async (req, res) => {
 };
 
 
-
-const saveChatSession = async (req, res) => {
-    try {
-        const { userId, sessionId, title, messages } = req.body;
-
-        const chat = new Chat({ 
-            userId, 
-            sessionId, 
-            title, 
-            messages
-        });
-        await chat.save();
-
-        res.status(201).json({ message: "Chat session saved", chat });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to save chat session" });
-    }
-};
-
-
-
 const handleReqResFromAi = async (req, res) => {
     try {
         const user_id = req.user?.id;
         const user = await User.findById(user_id);
-        const { userMessage } = req.body;
+        const { sessionId, title, userMessage } = req.body;
         if(!user) {
             return res.send({success: false, error: "User Not Found"});
         }
         const aiMessage = await sendReqToGemini(userMessage);
-        const chat = new Chat({
-            userId: user_id,
-            sessionId: uuidv4(),
-            title: userMessage,
-            messages: [
-                { "text": userMessage, "user": "me" },
-                { "text": aiMessage.content, "user": "ai" }
-            ]
-        })
+        const messages = [
+            { "text": userMessage, "user": "me" },
+            { "text": aiMessage.content, "user": "ai" },
+        ]
+        const existingChat = await Chat.findOne({ 
+            sessionId, 
+            userId: user_id
+        });
+        if (!existingChat) {
+            const chat = new Chat({ 
+              userId: user_id, 
+              sessionId: sessionId || uuidv4(),
+              title: title, 
+              messages: messages 
+        });
         await chat.save();
-        return res.send({success: true, message: "Chat session saved", chat});
+        } else {
+            const updatedChat = await Chat.findOneAndUpdate(
+            { sessionId, userId: user_id },
+            { $push: { messages: { $each: messages } } },
+            { new: true, runValidators: true }
+            ).exec();
+        }
+
+        return res.send({success: true, userMessage: userMessage, aiMessage: aiMessage.content});
     }
     catch(error) {
         return res.send({success: false, error: error.message})
@@ -94,5 +87,4 @@ const handleReqResFromAi = async (req, res) => {
 export {
     handleReqResFromAi,
     getUserChatHistory,
-    saveChatSession,
 }

@@ -7,6 +7,10 @@ const handleSignUp = async (req, res) => {
     if(!name || !email || !password) {
         return res.send({ success: false, error: "missing name, email or password"});
     }
+    const user = await User.findOne({email: email});
+    if(user) {
+        return res.send({success: false, error: "user already registered"});
+    }
     try{
         const user = await User.create({
             name,

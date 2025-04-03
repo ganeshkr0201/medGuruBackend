@@ -3,6 +3,7 @@ import { createTokenForUser } from "../services/authentication.js";
 
 
 const handleSignUp = async (req, res) => {
+    console.log("recieved a POST request on /api/user/signup");
     const { name, email, password } = req.body;
     if(!name || !email || !password) {
         return res.send({ success: false, error: "missing name, email or password"});
@@ -31,6 +32,7 @@ const handleSignUp = async (req, res) => {
 }
 
 const handleSignIn = async (req, res) => {
+    console.log("recieved a POST request on /api/user/signin");
     const { email, password } = req.body;
     const user = await User.findOne({email});
     if(!user) {
@@ -49,6 +51,7 @@ const handleSignIn = async (req, res) => {
 }
 
 const handleLogout = (req, res) => {
+    console.log("recieved a GET request on /api/user/logout");
     return res.clearCookie('token').send({success: true, message: "token removed"});
 }
 

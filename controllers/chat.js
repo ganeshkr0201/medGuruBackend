@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 const getUserChatHistory = async (req, res) => {
     try {
         const { user_id } = req.params;
-        console.log("recieved a GET request on /api/chat/history/",user_id);
+        console.log("recieved a GET request on /api/chat/history/"+user_id);
 
         const user = await User.findById(user_id);
         if(!user) {
@@ -53,7 +53,7 @@ const getUserChatHistory = async (req, res) => {
 const getUserChatSessionHistory = async (req, res) => {
     try {
         const { user_id, sessionId } = req.params;
-        console.log("recieved a GET request on /api/chat/history/",user_id,"/",sessionId);
+        console.log("recieved a GET request on /api/chat/history/"+user_id+"/"+sessionId);
         const result = await Chat.find({ 
             userId: user_id, 
             sessionId: sessionId 
@@ -69,7 +69,7 @@ const getUserChatSessionHistory = async (req, res) => {
 const handleReqResFromAi = async (req, res) => {
     try {
         const { user_id, sessionId } = req.params;
-        console.log("recieved a POST request on /api/chat/",user_id,"/",sessionId);
+        console.log("recieved a POST request on /api/chat/"+user_id+"/"+sessionId);
         const user = await User.findById(user_id);
         const { title, userMessage } = req.body;
         if(!user) {
@@ -114,7 +114,7 @@ const handleReqResFromAi = async (req, res) => {
 const deleteChatHistory = async (req, res) => {
     try {
         const { user_id, sessionId } = req.params;
-        console.log("recieved a DELETE request on /api/chat/history/",user_id,"/",sessionId);
+        console.log("recieved a DELETE request on /api/chat/history/"+user_id+"/"+sessionId);
         const result = await Chat.deleteMany({ 
             userId: user_id, 
             sessionId: sessionId 

@@ -44,11 +44,26 @@ const getUserChatHistory = async (req, res) => {
             }
         });
 
-        return res.json(history);
+        return res.send({success: true, history: history});
     } catch (error) {
         res.status(500).json({ error: "Server error while fetching chat history" });
     }
 };
+
+
+const getUserChatSessionHistory = async (req, res) => {
+    try {
+        const { user_id, sessionId } = req.params;
+        const result = await Chat.find({ 
+            userId: user_id, 
+            sessionId: sessionId 
+        });
+        return res.send({ success: true, history: result });
+    }
+    catch (error) {
+        return res.send({ success: false, error: error.message });
+    }
+}
 
 
 const handleReqResFromAi = async (req, res) => {
@@ -113,5 +128,6 @@ const deleteChatHistory = async (req, res) => {
 export {
     handleReqResFromAi,
     getUserChatHistory,
+    getUserChatSessionHistory,
     deleteChatHistory,
 }

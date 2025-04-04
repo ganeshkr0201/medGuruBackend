@@ -82,7 +82,7 @@ const handleReqResFromAi = async (req, res) => {
             userId: user_id, 
             sessionId: sessionId 
         });
-        const history = result;
+        const history = result[0].messages;
         const aiMessage = await sendReqToGemini(userMessage, history);
         const messages = [
             { "text": userMessage, "user": "me" },

@@ -78,7 +78,13 @@ const handleReqResFromAi = async (req, res) => {
         if(!userMessage) {
             return res.send({success: false, error: "user message missing"});
         }
-        const aiMessage = await sendReqToGemini(userMessage);
+        const result = await Chat.find({ 
+            userId: user_id, 
+            sessionId: sessionId 
+        });
+        const history = result;
+        console.log(history);
+        const aiMessage = await sendReqToGemini(userMessage, history);
         const messages = [
             { "text": userMessage, "user": "me" },
             { "text": aiMessage.content, "user": "ai" },

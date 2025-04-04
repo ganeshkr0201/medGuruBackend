@@ -4,10 +4,11 @@ dotenv.config();
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
-import { checkForAuthenticationCookie } from './middlewares/checkForAuthentication.js';
+import { User } from './models/user.js';
 import { connectToDB } from './config/connectDB.js';
 import userRouter from './routers/user.js';
 import chatRouter from './routers/chat.js';
+import adminRouter from './routers/admin.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,14 @@ app.use(cors({
 }));
 
 
+app.get('/add', async (req, res) => {
+    const updateUser = await User.updateMany(
+        { roles: { $exists: false } },
+        { $set: { roles: ['user'] } }
+      );           
+      console.log(updateUser);
+    return res.send({success: true, message: "user updated successfully"});
+})
 
 //EXPRESS ROUTES
 app.get('/', (req, res) => {
@@ -41,6 +50,7 @@ app.get('/', (req, res) => {
 })
 app.use('/api/user', userRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/admin', adminRouter);
 
 
 

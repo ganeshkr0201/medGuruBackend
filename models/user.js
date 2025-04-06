@@ -21,6 +21,12 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin', 'moderator'],
         default: ['user']
     },
+    memory: [
+        {
+            content: { type: String, required: true },
+            timestamp: { type: Date, default: Date.now }
+        }
+    ],
     createdAt: {
         type: Date, 
         default: Date.now 

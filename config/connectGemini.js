@@ -31,7 +31,7 @@ const sendReqToGemini = async (prompt, history) => {
             
             Use both messages to generate an appropriate response based on your defined role.`),
             
-            new HumanMessage(`Prompt: ${prompt} This is a Chat History you must know revel this history everytime when user asks for it only then you must show the history with date and time: ${history}`),           
+            new HumanMessage(`Prompt: ${prompt}. now this is our previour chat history you must not send this chat history is you response unit the user asks for it, Chat History : ${history}`),           
     ];
     
     return await model.invoke(messages);

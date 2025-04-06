@@ -65,56 +65,78 @@ const getUserChatSessionHistory = async (req, res) => {
     }
 }
 
-
 const handleReqResFromAi = async (req, res) => {
     try {
         const { user_id, sessionId } = req.params;
-        console.log("recieved a POST request on /api/chat/"+user_id+"/"+sessionId);
+        console.log("Received a POST request on /api/chat/" + user_id + "/" + sessionId);
+
         const user = await User.findById(user_id);
         const { title, userMessage } = req.body;
-        if(!user) {
-            return res.send({success: false, error: "User Not Found"});
+
+        if (!user) {
+            return res.send({ success: false, error: "User Not Found" });
         }
-        if(!userMessage) {
-            return res.send({success: false, error: "user message missing"});
+        if (!userMessage) {
+            return res.send({ success: false, error: "User message missing" });
         }
-        const result = await Chat.find({ 
-            userId: user_id, 
-            sessionId: sessionId 
-        });
+
+        const result = await Chat.find({ userId: user_id, sessionId });
         const history = result.length > 0 ? result[0].messages : " ";
-        console.log(history);
-        const aiMessage = await sendReqToGemini(userMessage, history);
+
+        // Format memory as concatenated string
+        const memory = user.memory?.map(m => m.content).join("\n") || "";
+
+        const aiMessage = await sendReqToGemini(userMessage, history, memory);
+
         const messages = [
-            { "text": userMessage, "user": "me" },
-            { "text": aiMessage.content, "user": "ai" },
-        ]
-        const existingChat = await Chat.findOne({ 
-            sessionId, 
-            userId: user_id
-        });
+            { text: userMessage, user: "me" },
+            { text: aiMessage.content, user: "ai" },
+        ];
+
+        // Save messages in chat
+        const existingChat = await Chat.findOne({ sessionId, userId: user_id });
         if (!existingChat) {
-            const chat = new Chat({ 
-              userId: user_id, 
-              sessionId: sessionId || uuidv4(),
-              title: title || userMessage, 
-              messages: messages 
-        });
-        await chat.save();
+            const chat = new Chat({
+                userId: user_id,
+                sessionId: sessionId || uuidv4(),
+                title: title || userMessage,
+                messages: messages,
+            });
+            await chat.save();
         } else {
-            const updatedChat = await Chat.findOneAndUpdate(
-            { sessionId, userId: user_id },
-            { $push: { messages: { $each: messages } } },
-            { new: true, runValidators: true }
+            await Chat.findOneAndUpdate(
+                { sessionId, userId: user_id },
+                { $push: { messages: { $each: messages } } },
+                { new: true, runValidators: true }
             ).exec();
         }
 
-        return res.send({success: true, userMessage: userMessage, aiMessage: aiMessage.content});
+        const summarizationPrompt = `Filter out important details and keywords from the following message:\n\n${aiMessage.content}`;
+        const memoryUpdate = await sendReqToGemini(summarizationPrompt, " ", " ");
+
+        // Delete memory older than 30 days
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        user.memory = user.memory.filter(entry => new Date(entry.timestamp) > oneMonthAgo);
+
+        user.memory.push({
+            content: memoryUpdate.content,
+            timestamp: new Date()
+        });
+
+        await user.save();
+
+
+        return res.send({
+            success: true,
+            userMessage: userMessage,
+            aiMessage: aiMessage.content
+        });
+    } 
+    catch (error) {
+        return res.send({ success: false, error: error.message });
     }
-    catch(error) {
-        return res.send({success: false, error: error.message})
-    }
-}
+};
 
 
 const deleteChatHistory = async (req, res) => {

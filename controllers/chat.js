@@ -84,7 +84,8 @@ const handleReqResFromAi = async (req, res) => {
         const history = result.length > 0 ? result[0].messages : " ";
 
         // Format memory as concatenated string
-        const memory = user.memory?.map(m => m.content).join("\n") || "";
+        const name = user.name;
+        const memory =`i am ${name} and our chat summery is ${user.memory?.map(m => m.content).join("\n") || ""}`;
 
         const aiMessage = await sendReqToGemini(userMessage, history, memory);
 

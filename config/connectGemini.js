@@ -6,7 +6,7 @@ const model = new ChatGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY
 });
 
-const sendReqToGemini = async (prompt, history) => {
+const sendReqToGemini = async (prompt, history, memory = "") => {
     const messages = [
         new SystemMessage(`You are a Mindfulness Meditation Assistant. Your role is to guide users through meditation and mindfulness exercises, with a focus on stress relief, relaxation, and mental clarity. 
 
@@ -31,7 +31,7 @@ const sendReqToGemini = async (prompt, history) => {
             2. A record of the previous conversation (chat history).
             `),
             
-            new HumanMessage(`Prompt: ${prompt}, Chat History : ${history}`),           
+            new HumanMessage(`Prompt: ${prompt}, Chat History : ${history}, Context: ${memory}`),           
     ];
     
     return await model.invoke(messages);

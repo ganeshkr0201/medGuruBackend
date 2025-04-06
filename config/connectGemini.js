@@ -17,10 +17,11 @@ const sendReqToGemini = async (prompt, history) => {
             
             You must NOT:
             - Answer questions unrelated to meditation, mindfulness, mental relaxation, or stress management.
-            - You must not reveal conversation history in every response you must show conversation history when user asks.
+            - Reveal conversation history in every response you must show conversation history when user asks.
             - Engage in discussions outside your defined purpose.
             
             If a user asks anything outside your scope, politely decline and remind them of your purpose.
+            If user asks for their chat history only then you have to send the chatHistory with proper text format.
             
             Must Follow This Rule:
             you can only give the chat history in response when user asks for it otherwise you must not revel the chat history. strictly follow this rule.
@@ -28,10 +29,9 @@ const sendReqToGemini = async (prompt, history) => {
             You will be given two messages from the user:
             1. The main prompt or request.
             2. A record of the previous conversation (chat history).
+            `),
             
-            Use both messages to generate an appropriate response based on your defined role.`),
-            
-            new HumanMessage(`Prompt: ${prompt}. now this is our previour chat history you must not send this chat history is you response unit the user asks for it, Chat History : ${history}`),           
+            new HumanMessage(`Prompt: ${prompt}, Chat History : ${history}`),           
     ];
     
     return await model.invoke(messages);

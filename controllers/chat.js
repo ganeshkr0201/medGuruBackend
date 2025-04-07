@@ -85,8 +85,8 @@ const handleReqResFromAi = async (req, res) => {
 
         // Format memory as concatenated string
         const name = user.name;
-        console.log(name);
-        const memory =`i am ${name} and our chat summery is ${user.memory?.map(m => m.content).join("\n") || ""}`;
+        // console.log(name); 
+        const memory = `i am ${name} and You know the following about the me based on our past conversations:\n${user.memory?.map(m => m.content).join("\n") || ""}`;
 
         const aiMessage = await sendReqToGemini(userMessage, history, memory);
 
@@ -95,23 +95,34 @@ const handleReqResFromAi = async (req, res) => {
             { text: aiMessage.content, user: "ai" },
         ];
 
-        // Save messages in chat
+        // Save messages in chat     
         const existingChat = await Chat.findOne({ sessionId, userId: user_id });
+
         if (!existingChat) {
+            // Create new chat with custom createdAt
             const chat = new Chat({
                 userId: user_id,
                 sessionId: sessionId || uuidv4(),
                 title: title || userMessage,
-                messages: messages,
+                messages,
+                createdAt: Date.now() // Mongoose will set this anyway, but you’re being explicit
             });
             await chat.save();
         } else {
+            // Update existing chat: append messages, update title, and override createdAt
             await Chat.findOneAndUpdate(
                 { sessionId, userId: user_id },
-                { $push: { messages: { $each: messages } } },
+                {
+                    $push: { messages: { $each: messages } },
+                    $set: {
+                        title: title || userMessage,
+                        createdAt: Date.now()
+                    }
+                },
                 { new: true, runValidators: true }
-            ).exec();
+            );
         }
+        
 
         const summarizationPrompt = `
         Extract only personal facts about the user from the following message pair. Do not include explanations, headers, or bullet formatting.

@@ -4,7 +4,7 @@ import { Chat } from "../models/chat.js";
 const updateRoles = async (req, res) => {
     try{
         const { userId } = req.params;
-        console.log(`recieved a POST request on /api/admin/update-roles/+${userId}`);
+        console.log(`recieved a POST request on /api/admin/update-roles/${userId}`);
         const { email, newRoles } = req.body;
         const validRoles = ['user', 'admin', 'moderator'];
         if(!email || !newRoles) {
@@ -32,14 +32,14 @@ const updateRoles = async (req, res) => {
 
 const showAllChats = async(req, res) => {
     const { userId } = req.params;
-    console.log(`recieved a GET request on /api/admin/show-chats/+${userId}`);
+    console.log(`recieved a GET request on /api/admin/show-chats/${userId}`);
     const chats = await Chat.find({});
     return res.send({success: true, chats: chats});
 }
 
 const showAllUsers = async(req, res) => {
     const { userId } = req.params;
-    console.log(`recieved a POST request on /api/admin/show-users/+${userId}`);
+    console.log(`recieved a POST request on /api/admin/show-users/${userId}`);
     const users = await User.find({});
     return res.send({success: true, users: users});
 }

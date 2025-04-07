@@ -85,6 +85,7 @@ const handleReqResFromAi = async (req, res) => {
 
         // Format memory as concatenated string
         const name = user.name;
+        console.log(name);
         const memory =`i am ${name} and our chat summery is ${user.memory?.map(m => m.content).join("\n") || ""}`;
 
         const aiMessage = await sendReqToGemini(userMessage, history, memory);
@@ -112,7 +113,25 @@ const handleReqResFromAi = async (req, res) => {
             ).exec();
         }
 
-        const summarizationPrompt = `Filter out important details and keywords from the following message:\n\n${aiMessage.content}`;
+        const summarizationPrompt = `
+        Extract only personal facts about the user from the following message pair. Do not include explanations, headers, or bullet formatting.
+        
+        Respond with direct facts only, such as:
+        - Name
+        - Age
+        - Location
+        - Health conditions
+        - Preferences
+        - Emotional state
+        - Hobbies
+        - Repetitive behavior
+        - Goals
+        
+        Only include user-related facts. Omit anything about the assistant.
+        
+        User: ${userMessage}  
+        Assistant: ${aiMessage.content}
+        `;
         const memoryUpdate = await sendReqToGemini(summarizationPrompt, " ", " ");
 
         // Delete memory older than 30 days

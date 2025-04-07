@@ -20,8 +20,12 @@ const chatSchema = new mongoose.Schema({
             user: { type: String, enum: ["me", "ai"], required: true },
             timestamp: { type: Date, default: Date.now }
         }
-    ]
-}, { timestamps: true });
+    ],
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
 
 const Chat = mongoose.model("Chat", chatSchema);
 export { Chat };

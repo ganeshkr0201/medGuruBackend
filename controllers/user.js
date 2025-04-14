@@ -1,5 +1,7 @@
 import { User } from "../models/user.js";
+import { Chat } from "../models/chat.js";
 import { createTokenForUser } from "../services/authentication.js";
+import mongoose from "mongoose";
 
 
 const handleSignUp = async (req, res) => {
@@ -55,9 +57,33 @@ const handleLogout = (req, res) => {
     return res.clearCookie('token').send({success: true, message: "token removed"});
 }
 
+const handleDelete = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { password } = req.body;
+        console.log("recieved a GET request on /api/user/delete"+userId);
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.send({ success: false, error: "User Doesn't Exist"});
+        }
+        if(!password) {
+            return res.send({ success: false, error: "Password Empty"});
+        }
+        if(user.password != password) {
+            return res.send({ success: false, error: "Incorrect Password"});
+        }
+        await Chat.deleteMany({ userId: new mongoose.Types.ObjectId(userId) });
+        await User.findByIdAndDelete(userId);
+        return res.send({ success: true, message: "User Deleted Successfully"});
+    }
+    catch (error) {
+        return res.send({ success: false, error: error.message });
+    }
+}
+
 export {
     handleSignUp,
     handleSignIn,
-    handleLogout
+    handleLogout,
+    handleDelete,
 }
-

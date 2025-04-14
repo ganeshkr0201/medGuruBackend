@@ -6,6 +6,6 @@ const userRouter = express.Router();
 userRouter.post('/signup', handleSignUp);
 userRouter.post('/signin', handleSignIn);
 userRouter.get('/logout', handleLogout);
-userRouter.post('/delete/:userId', handleDelete);
+userRouter.delete('/delete/:userId', handleDelete);
 
 export default userRouter;
